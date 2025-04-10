@@ -1,4 +1,4 @@
-package com.kaustubh.database.model
+package com.kaustubh.spring_boot_crash_course.database.model
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id

@@ -1,6 +1,6 @@
-package com.kaustubh.database.repository
+package com.kaustubh.spring_boot_crash_course.database.repository
 
-import com.kaustubh.database.model.Note
+import com.kaustubh.spring_boot_crash_course.database.model.Note
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 
