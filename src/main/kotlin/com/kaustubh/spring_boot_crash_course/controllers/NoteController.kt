@@ -65,5 +65,4 @@ private fun Note.toResponse(): NoteController.NoteResponse{
         createdAt = createdAt,
         color = color
     )
-
 }
