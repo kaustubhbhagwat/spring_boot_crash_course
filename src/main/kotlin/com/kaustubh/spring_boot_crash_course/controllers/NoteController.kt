@@ -51,11 +51,12 @@ class NoteController (private val noteRepository: NoteRepository){
     fun findByOwnerId(
         @RequestParam ownerId: String
     ): List<NoteResponse>{
-        return noteRepository.findByOwnerId(ObjectId()).map {
+        return noteRepository.findByOwnerId(ObjectId(ownerId)).map {
             it.toResponse()
         }
     }
 }
+
 
 private fun Note.toResponse(): NoteController.NoteResponse{
     return NoteResponse(
