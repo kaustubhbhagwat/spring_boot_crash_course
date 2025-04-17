@@ -4,7 +4,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 
 @Component
-class HasHencoder {
+class Hashencoder {
 
     private val bCrypt = BCryptPasswordEncoder()
 
