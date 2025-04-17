@@ -1,5 +1,6 @@
 package com.kaustubh.spring_boot_crash_course.security
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
@@ -32,7 +33,6 @@ class JwtService(
             .compact()
     }
 
-
     fun generateAccessToken(userId: String): String{
         return generateToken(userId,"access",accessTokenValidityMs)
     }
@@ -40,4 +40,41 @@ class JwtService(
     fun generateRefreshToken(userId: String): String{
         return generateToken(userId,"refresh",refreshTokenValidityMs)
     }
+
+    fun parseAllClaims(token: String): Claims? {
+        return try{
+            Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+
+        }catch (e:Exception){
+            null
+        }
+    }
+
+    fun validateAccessToken(token: String): Boolean{
+        val claims = parseAllClaims(token) ?: return false
+        val tokenType = claims["type"] as? String ?: return false
+        return tokenType == "access"
+    }
+
+    fun validateRefreshToken(token: String): Boolean{
+        val claims = parseAllClaims(token) ?: return false
+        val tokenType = claims["type"] as? String ?: return false
+        return tokenType == "refresh"
+    }
+
+    // Authorization : <token>
+    fun getUserIdFromToken(token: String): String{
+        val rawToken = if(token.startsWith("Bearer ")){
+            token.removePrefix("Baerer ")
+        }else token
+
+        val claims = parseAllClaims(rawToken) ?: throw IllegalArgumentException("Invalid Token")
+        return claims.subject
+    }
+
+
 }
