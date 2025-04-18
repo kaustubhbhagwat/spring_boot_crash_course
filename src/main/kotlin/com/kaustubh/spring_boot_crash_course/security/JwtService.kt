@@ -42,11 +42,15 @@ class JwtService(
     }
 
     fun parseAllClaims(token: String): Claims? {
+        val rawToken = if(token.startsWith("Bearer ")){
+            token.removePrefix("Baerer ")
+        }else token
+
         return try{
             Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
-                .parseSignedClaims(token)
+                .parseSignedClaims(rawToken )
                 .payload
 
         }catch (e:Exception){
@@ -68,13 +72,7 @@ class JwtService(
 
     // Authorization : <token>
     fun getUserIdFromToken(token: String): String{
-        val rawToken = if(token.startsWith("Bearer ")){
-            token.removePrefix("Baerer ")
-        }else token
-
-        val claims = parseAllClaims(rawToken) ?: throw IllegalArgumentException("Invalid Token")
+        val claims = parseAllClaims(token) ?: throw IllegalArgumentException("Invalid Token")
         return claims.subject
     }
-
-
 }
