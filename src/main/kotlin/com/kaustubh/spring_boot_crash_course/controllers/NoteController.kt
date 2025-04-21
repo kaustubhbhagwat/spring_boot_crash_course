@@ -4,6 +4,7 @@ import com.kaustubh.spring_boot_crash_course.controllers.NoteController.NoteResp
 import com.kaustubh.spring_boot_crash_course.database.model.Note
 import com.kaustubh.spring_boot_crash_course.database.repository.NoteRepository
 import org.bson.types.ObjectId
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -54,9 +55,8 @@ class NoteController (private val noteRepository: NoteRepository){
     }
 
     @GetMapping
-    fun findByOwnerId(
-        @RequestParam ownerId: String
-    ): List<NoteResponse>{
+    fun findByOwnerId(): List<NoteResponse>{
+        val ownerId = SecurityContextHolder.getContext().authentication.principal as String
         return noteRepository.findByOwnerId(ObjectId(ownerId)).map {
             it.toResponse()
         }
