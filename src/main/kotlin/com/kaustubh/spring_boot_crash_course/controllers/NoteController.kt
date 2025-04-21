@@ -40,14 +40,16 @@ class NoteController (private val noteRepository: NoteRepository){
 
     @PostMapping
     fun save(@RequestBody body: NoteRequest): NoteResponse{
-       val note =  noteRepository.save(
+        val ownerId = SecurityContextHolder.getContext().authentication.principal as String
+
+        val note =  noteRepository.save(
             Note(
                 id = body.id?.let { ObjectId(it)} ?: ObjectId.get() ,
                 title = body.title,
                 content = body.content,
                 color = body.color,
                 createdAt = Instant.now(),
-                ownerId = ObjectId()
+                ownerId = ObjectId(ownerId)
             )
         )
 
@@ -64,7 +66,16 @@ class NoteController (private val noteRepository: NoteRepository){
 
     @DeleteMapping(path = ["/{id}"])
     fun deleteById(@PathVariable id: String){
-         noteRepository.deleteById(ObjectId(id))
+
+        val note = noteRepository.findById(ObjectId(id)).orElseThrow() {
+            IllegalArgumentException("Note not found")
+        }
+        val ownerId = SecurityContextHolder.getContext().authentication.principal as String
+
+        if(note.ownerId.toHexString() == ownerId){
+            noteRepository.deleteById(ObjectId(id))
+
+        }
     }
 }
 
