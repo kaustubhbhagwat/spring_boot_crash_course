@@ -77,8 +77,8 @@ class AuthService(
         }
 
         val hashed = hashToken(token)
-        refreshTokenRepository.findByUSerIdAndHashedToken(user.id,hashed) ?: throw  IllegalArgumentException("Refresh token not recognised (maybe used or expired")
-         refreshTokenRepository.deleteByUSerIdAndHashedToken(user.id,hashed)
+        refreshTokenRepository.findByUserIdAndHashedToken(user.id,hashed) ?: throw  IllegalArgumentException("Refresh token not recognised (maybe used or expired")
+         refreshTokenRepository.deleteByUserIdAndHashedToken(user.id,hashed)
 
         val newAccessToken = jwtService.generateAccessToken(userId)
         val newRefreshToken = jwtService.generateRefreshToken(userId)
