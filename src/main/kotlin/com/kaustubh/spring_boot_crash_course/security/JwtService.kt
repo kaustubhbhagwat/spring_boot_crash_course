@@ -43,7 +43,7 @@ class JwtService(
 
     fun parseAllClaims(token: String): Claims? {
         val rawToken = if(token.startsWith("Bearer ")){
-            token.removePrefix("Baerer ")
+            token.removePrefix("Bearer ")
         }else token
 
         return try{
