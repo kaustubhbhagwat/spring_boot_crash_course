@@ -20,12 +20,17 @@ class SecurityConfig(
             .csrf {     csrf -> csrf.disable() }
             .sessionManagement{it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
             .authorizeHttpRequests {  auth->
-                auth.requestMatchers("auth/**")
+                auth
+                    .requestMatchers("/")
+                    .permitAll()
+                    .requestMatchers("/auth/**")
                     .permitAll()
                     .dispatcherTypeMatchers(
                         DispatcherType.ERROR,
                         DispatcherType.FORWARD)
                     .permitAll()
+                    .anyRequest()
+                    .authenticated()
             }
             .exceptionHandling { configurer ->
                 configurer.authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

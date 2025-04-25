@@ -5,6 +5,7 @@ import com.kaustubh.spring_boot_crash_course.database.model.User
 import com.kaustubh.spring_boot_crash_course.database.repository.RefreshTokenRepository
 import com.kaustubh.spring_boot_crash_course.database.repository.UserRepository
 import org.bson.types.ObjectId
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.stereotype.Service
@@ -26,6 +27,10 @@ class AuthService(
     )
 
     fun register(email: String, password: String): User {
+        val user = userRepository.findByEmail(email.trim())
+        if (user != null){
+            throw ResponseStatusException(HttpStatus.CONFLICT,"User with this email already exists.")
+        }
        return userRepository.save(
             User(
                 email= email,
@@ -78,11 +83,12 @@ class AuthService(
         }
 
         val hashed = hashToken(refreshToken)
-        refreshTokenRepository.findByUserIdAndHashedToken(user.id,hashed) ?:
-        throw ResponseStatusException(HttpStatusCode.valueOf(401),"Refresh maybe used or expired")
-
+        refreshTokenRepository.findByUserIdAndHashedToken(user.id,hashed)
+            ?: throw ResponseStatusException(
+                HttpStatusCode.valueOf(401),
+                "Refresh maybe used or expired"
+            )
         refreshTokenRepository.deleteByUserIdAndHashedToken(user.id,hashed)
-
         val newAccessToken = jwtService.generateAccessToken(userId)
         val newRefreshToken = jwtService.generateRefreshToken(userId)
         storeRefreshedToken(user.id,newAccessToken)
