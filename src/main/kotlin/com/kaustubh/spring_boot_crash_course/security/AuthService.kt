@@ -65,20 +65,20 @@ class AuthService(
     }
 
     @Transactional
-    fun refresh(token: String): TokenPair{
-
-        if(!jwtService.validateRefreshToken(token)) {
+    fun refresh(refreshToken: String): TokenPair{
+        if(!jwtService.validateRefreshToken(refreshToken)) {
             throw IllegalArgumentException("Invalid Refresh Token")
         }
 
-        val userId = jwtService.getUserIdFromToken(token)
-        val user = userRepository.findById(ObjectId(userId)).orElseThrow(){
+        val userId = jwtService.getUserIdFromToken(refreshToken)
+        val user = userRepository.findById(ObjectId(userId)).orElseThrow{
             IllegalArgumentException("Invalid Refresh Token")
         }
 
-        val hashed = hashToken(token)
-        refreshTokenRepository.findByUserIdAndHashedToken(user.id,hashed) ?: throw  IllegalArgumentException("Refresh token not recognised (maybe used or expired")
-         refreshTokenRepository.deleteByUserIdAndHashedToken(user.id,hashed)
+        val hashed = hashToken(refreshToken)
+        refreshTokenRepository.findByUserIdAndHashedToken(user.id,hashed) ?:
+        throw  IllegalArgumentException("Refresh token not recognised (maybe used or expired)")
+        refreshTokenRepository.deleteByUserIdAndHashedToken(user.id,hashed)
 
         val newAccessToken = jwtService.generateAccessToken(userId)
         val newRefreshToken = jwtService.generateRefreshToken(userId)
@@ -90,7 +90,6 @@ class AuthService(
     private fun hashToken(token: String): String{
         val messageDigest = MessageDigest.getInstance("SHA-256")
         val hashBytes = messageDigest.digest(token.encodeToByteArray())
-
         return  java.util.Base64.getEncoder().encodeToString(hashBytes)
     }
 }
