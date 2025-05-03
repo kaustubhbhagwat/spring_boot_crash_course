@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestController
 class StatusController {
     @GetMapping
     fun getStatus():String{
-        return "Everything Cool"
+        return "Everything Seems to be working"
     }
 }
